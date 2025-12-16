@@ -25,5 +25,10 @@ dist-ssr
 
 node_modules/*
 catan.db
-.env
+.env.local
+.env.private
 catan-server/uploads/*
+.env
+
+# Sensitive configuration files
+nginx-config.local.txt

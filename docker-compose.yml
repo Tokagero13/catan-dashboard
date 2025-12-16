@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - ./catan-server/uploads:/app/backend/uploads
+      - ./catan-server/catan.db:/app/backend/catan.db
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+    restart: unless-stopped
+
+  # Optional: separate database volume
+  # db-data:
+  #   driver: local

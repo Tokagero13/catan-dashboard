@@ -1,8 +1,13 @@
 import cors from 'cors';
+import dotenv from 'dotenv';
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import sqlite3 from 'sqlite3';
+
+// Load environment variables from the project root
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env.local'), override: true });
 
 const UPLOADS_DIR = 'uploads';
 if (!fs.existsSync(UPLOADS_DIR)) {
@@ -17,7 +22,48 @@ const db = new sqlite3.Database('catan.db', (err) => {
 });
 
 const app = express();
-app.use(cors());
+const allowedOrigins = process.env.VITE_ALLOWED_HOSTS
+  ? process.env.VITE_ALLOWED_HOSTS.split(',').map(host => host.trim())
+  : ['localhost', '127.0.0.1'];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // In production behind nginx proxy, origin might be null
+    if (!origin && process.env.NODE_ENV === 'production') {
+      return callback(null, true);
+    }
+    
+    // Allow requests with no origin (like mobile apps or curl requests) in development
+    if (!origin && process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+
+    // Allow if the origin is in the allowed list
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Also allow if origin's hostname is in the list (for vite.config.ts compatibility)
+    try {
+      const originHostname = new URL(origin).hostname;
+      if (allowedOrigins.includes(originHostname)) {
+        return callback(null, true);
+      }
+    } catch (e) {
+      // Invalid URL, proceed to deny
+    }
+
+    // In production, allow requests from same host (nginx proxy)
+    if (process.env.NODE_ENV === 'production') {
+      return callback(null, true);
+    }
+
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(msg), false);
+  },
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
@@ -291,7 +337,7 @@ app.get('/leaderboard', (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 3002;
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Catan API server running on port ${PORT}`);
 });
