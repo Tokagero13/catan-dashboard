@@ -26,3 +26,4 @@ dist-ssr
 node_modules/*
 catan.db
 .env
+catan-server/uploads/*
