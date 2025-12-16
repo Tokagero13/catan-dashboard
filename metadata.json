@@ -1,0 +1,5 @@
+{
+  "name": "Catan Manager",
+  "description": "Веб-приложение для генерации карт Catan, управления таблицей лидеров и просмотра правил.",
+  "requestFramePermissions": []
+}
