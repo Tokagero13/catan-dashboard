@@ -69,8 +69,10 @@ const Leaderboard: React.FC = () => {
     setScore(prev => ({ ...prev, total }));
   }, [score.settlements, score.cities, score.victoryCards, score.longestRoad, score.largestArmy]);
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDelete = async (id: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
     if (window.confirm('Вы уверены, что хотите удалить эту игру?')) {
       await db.deleteSession(id);
       loadData();
@@ -239,7 +241,7 @@ const Leaderboard: React.FC = () => {
             <p className="text-blue-200 text-sm">{s.created_date}</p>
           </div>
 
-          <div className="p-6 overflow-y-auto">
+          <div className="p-6 overflow-y-auto flex-1">
             <div className="flex flex-col md:flex-row gap-8">
               {/* Left Column: Photo & Winner */}
               <div className="md:w-1/3 flex flex-col items-center">
@@ -305,6 +307,16 @@ const Leaderboard: React.FC = () => {
                 )}
               </div>
             </div>
+          </div>
+
+          <div className="border-t border-gray-100 px-6 py-4 flex justify-between items-center bg-gray-50">
+            <span className="text-xs text-gray-500">Действия с этой игрой</span>
+            <button
+              onClick={() => handleDelete(s.id)}
+              className="text-red-600 hover:text-red-800 font-semibold text-sm bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition-colors"
+            >
+              Удалить игру
+            </button>
           </div>
         </div>
       </div>
@@ -586,13 +598,12 @@ const Leaderboard: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Группа</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Победитель</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Очки</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Действия</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {sessions.map((session) => (
-                <tr 
-                  key={session.id} 
+                <tr
+                  key={session.id}
                   onClick={() => setSelectedSession(session)}
                   className="hover:bg-blue-50 transition-colors cursor-pointer"
                 >
@@ -606,14 +617,6 @@ const Leaderboard: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600 font-mono">
                     {session.scoreBreakdown ? session.scoreBreakdown.total : '-'}
-                  </td>
-                  <td className="px-6 py-4 text-right text-sm font-medium">
-                    <button 
-                      onClick={(e) => handleDelete(session.id, e)} 
-                      className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1 rounded transition-colors"
-                    >
-                      Удалить
-                    </button>
                   </td>
                 </tr>
               ))}
