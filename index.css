@@ -1,0 +1,35 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Базовая мобильная настройка страницы */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Основной контейнер React */
+#root {
+  min-height: 100vh;
+}
+
+/* Предотвращаем неожиданный горизонтальный скролл на мобильных.
+   Внутренние контейнеры (таблицы и т.п.) уже имеют overflow-x-auto. */
+body {
+  overflow-x: hidden;
+  background-color: #f9fafb; /* соответствует Tailwind bg-gray-50 */
+  color: #0f172a; /* соответствует Tailwind text-slate-800 */
+}
+
+/* Изображения по умолчанию адаптивные */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
